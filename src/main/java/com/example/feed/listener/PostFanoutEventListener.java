@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,10 +59,7 @@ public class PostFanoutEventListener {
             .map(Follow::getFollowerId)
             .collect(Collectors.toList());
         
-        Set<Long> activeUserIds = userRepository.findActiveUsersInList(followerIds, cutoffDate)
-            .stream()
-            .map(user -> user.getId())
-            .collect(Collectors.toSet());
+        Set<Long> activeUserIds = new HashSet<>(userRepository.findActiveUserIdsInList(followerIds, cutoffDate));
         
         List<FeedItem> feedItems = followers.stream()
             .filter(follow -> activeUserIds.contains(follow.getFollowerId()))
@@ -88,8 +86,8 @@ public class PostFanoutEventListener {
                 event.getFollowerId(), event.getFolloweeId());
         
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(ACTIVE_USER_DAYS);
-        boolean isFollowerActive = userRepository.findActiveUsersInList(
-            List.of(event.getFollowerId()), cutoffDate).size() > 0;
+        boolean isFollowerActive = !userRepository.findActiveUserIdsInList(
+            List.of(event.getFollowerId()), cutoffDate).isEmpty();
         
         if (!isFollowerActive) {
             log.info("Usuario {} no ha tenido actividad en los últimos {} días, omitiendo fanout", 

@@ -20,4 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("SELECT u FROM User u WHERE u.id IN :userIds AND u.lastLoginAt > :cutoffDate")
     List<User> findActiveUsersInList(@Param("userIds") List<Long> userIds, @Param("cutoffDate") LocalDateTime cutoffDate);
+    
+    @Query("SELECT u.id FROM User u WHERE u.id IN :userIds AND u.lastLoginAt > :cutoffDate")
+    List<Long> findActiveUserIdsInList(@Param("userIds") List<Long> userIds, @Param("cutoffDate") LocalDateTime cutoffDate);
 }
