@@ -47,25 +47,18 @@ public class PostFanoutEventListener {
     public void handlePostCreated(PostCreatedEvent event) {
         log.info("Iniciando fanout para post ID: {}", event.getPostId());
         
-        List<Follow> followers = followRepository.findByFolloweeId(event.getAuthorId());
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(ACTIVE_USER_DAYS);
+        List<Long> activeFollowerIds = followRepository.findActiveFollowerIds(event.getAuthorId(), cutoffDate);
         
-        if (followers.isEmpty()) {
-            log.info("No hay seguidores para fanout del post ID: {}", event.getPostId());
+        if (activeFollowerIds.isEmpty()) {
+            log.info("No hay seguidores activos para fanout del post ID: {}", event.getPostId());
             return;
         }
         
-        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(ACTIVE_USER_DAYS);
-        List<Long> followerIds = followers.stream()
-            .map(Follow::getFollowerId)
-            .collect(Collectors.toList());
-        
-        Set<Long> activeUserIds = new HashSet<>(userRepository.findActiveUserIdsInList(followerIds, cutoffDate));
-        
-        List<FeedItem> feedItems = followers.stream()
-            .filter(follow -> activeUserIds.contains(follow.getFollowerId()))
-            .map(follow -> new FeedItem(
+        List<FeedItem> feedItems = activeFollowerIds.stream()
+            .map(followerId -> new FeedItem(
                 null,
-                follow.getFollowerId(),
+                followerId,
                 event.getPostId(),
                 event.getAuthorId(),
                 event.getCreatedAt(),
@@ -75,8 +68,8 @@ public class PostFanoutEventListener {
         
         feedItemRepository.saveAll(feedItems);
         
-        log.info("Fanout completado para post ID: {} - {} seguidores activos notificados de {} seguidores totales", 
-                event.getPostId(), feedItems.size(), followers.size());
+        log.info("Fanout completado para post ID: {} - {} seguidores activos notificados", 
+                event.getPostId(), feedItems.size());
     }
     
     @EventListener
