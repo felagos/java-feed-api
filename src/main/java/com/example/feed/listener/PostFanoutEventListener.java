@@ -88,8 +88,8 @@ public class PostFanoutEventListener {
                 event.getFollowerId(), event.getFolloweeId());
         
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(ACTIVE_USER_DAYS);
-        boolean isFollowerActive = userRepository.findActiveUsersInList(
-            List.of(event.getFollowerId()), cutoffDate).size() > 0;
+        boolean isFollowerActive = !userRepository.findActiveUsersInList(
+                List.of(event.getFollowerId()), cutoffDate).isEmpty();
         
         if (!isFollowerActive) {
             log.info("Usuario {} no ha tenido actividad en los últimos {} días, omitiendo fanout", 

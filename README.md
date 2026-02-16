@@ -2,6 +2,22 @@
 
 This Spring Boot application provides a social feed API with PostgreSQL database, containerized using Docker Compose.
 
+## 🧠 AI Documentation Agent
+
+**¡Nuevo!** El proyecto incluye un agente inteligente para documentar cambios automáticamente.
+
+### Uso Rápido
+- **Atajo**: `Cmd+Shift+D` (Mac) / `Ctrl+Shift+D` (Windows/Linux)  
+- **Comando**: `Cmd+Shift+P` → "📝 Documentar Cambios"
+- **Terminal**: `node .vscode/document-changes.js`
+
+**Genera**: Lista de archivos, resumen de solución, diagrama Mermaid y estadísticas.  
+**Salida**: `./docs/changes/YYYY-MM-DD-rama-changes.md`
+
+📖 [Documentación completa del agente](.vscode/README-DocumentationAgent.md)
+
+---
+
 ## Prerequisites
 
 - Docker
