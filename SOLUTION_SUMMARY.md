@@ -203,7 +203,7 @@ graph LR
     A["PostCreatedEvent"] -->|Publicado| B["PostFanoutEventListener"]
     C["UserFollowedEvent"] -->|Publicado| B
     
-    B -->|@Async| D["ThreadPool<br/>fanoutTaskExecutor<br/>5-10 threads"]
+    B -->|Async| D["ThreadPool<br/>fanoutTaskExecutor<br/>5-10 threads"]
     
     D --> E["Procesar Followers"]
     D --> F["Filtrar Active Users<br/>últimos 10 días"]
